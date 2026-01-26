@@ -1,0 +1,152 @@
+/**
+ * ZUL Gallery Frontend Styles
+ */
+
+/* Gallery Container - high specificity */
+div.zul-gallery {
+    display: grid !important;
+    gap: 15px;
+    margin: 20px 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Column variations */
+div.zul-gallery.zul-gallery-columns-1 {
+    grid-template-columns: 1fr;
+}
+
+div.zul-gallery.zul-gallery-columns-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+div.zul-gallery.zul-gallery-columns-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+div.zul-gallery.zul-gallery-columns-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+div.zul-gallery.zul-gallery-columns-5 {
+    grid-template-columns: repeat(5, 1fr);
+}
+
+div.zul-gallery.zul-gallery-columns-6 {
+    grid-template-columns: repeat(6, 1fr);
+}
+
+/* Gallery Item */
+div.zul-gallery .zul-gallery-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #f5f5f5;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Gallery Link */
+div.zul-gallery .zul-gallery-item a.zul-gallery-link {
+    display: block !important;
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    height: auto;
+    min-height: 150px;
+}
+
+/* Gallery Image - critical visibility rules */
+div.zul-gallery .zul-gallery-item img.zul-gallery-image {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    position: relative;
+}
+
+div.zul-gallery .zul-gallery-item:hover img.zul-gallery-image {
+    transform: scale(1.05);
+}
+
+/* Caption */
+div.zul-gallery .zul-gallery-caption {
+    display: block;
+    padding: 8px 10px;
+    font-size: 14px;
+    line-height: 1.4;
+    background: #fff;
+    color: #333;
+}
+
+/* Overlay on hover */
+div.zul-gallery .zul-gallery-link::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0);
+    transition: background 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+div.zul-gallery .zul-gallery-item:hover .zul-gallery-link::after {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* Error message */
+.zul-gallery-error {
+    padding: 15px;
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 4px;
+    color: #856404;
+    font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    div.zul-gallery.zul-gallery-columns-4,
+    div.zul-gallery.zul-gallery-columns-5,
+    div.zul-gallery.zul-gallery-columns-6 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    div.zul-gallery.zul-gallery-columns-3,
+    div.zul-gallery.zul-gallery-columns-4,
+    div.zul-gallery.zul-gallery-columns-5,
+    div.zul-gallery.zul-gallery-columns-6 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    div.zul-gallery {
+        gap: 10px;
+    }
+}
+
+/* Loading state */
+div.zul-gallery.zul-loading {
+    opacity: 0.5;
+}
+
+/* Fancybox customizations */
+.fancybox__container {
+    --fancybox-bg: rgba(0, 0, 0, 0.9);
+}
+
+.fancybox__caption {
+    padding: 15px 20px;
+    font-size: 16px;
+    line-height: 1.5;
+}

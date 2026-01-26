@@ -1,0 +1,7 @@
+vendor/
+.phpunit.cache/
+coverage/
+*.md
+!README.md
+.git/
+.gitignore

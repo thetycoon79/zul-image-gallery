@@ -1,0 +1,60 @@
+# Dependencies
+/vendor/
+/node_modules/
+
+# Testing
+/.phpunit.cache/
+/coverage/
+.phpunit.result.cache
+
+# IDE
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+/docker-data/
+
+# Logs
+*.log
+/logs/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Temporary files
+/tmp/
+*.tmp
+*.bak
+
+# Build artifacts
+/build/
+/dist/
+
+# AI assistants
+/.chatgpt/
+/.copilot/
+/.github-copilot/
+/.ai-assistant/
+/.ai-suggestions/
+/.codeium/
+/.tabnine/
+/.replit/
+/.kite/
+/.sourcery/
+/.intellicode/
+/.codium/
+/.gpt4code/
+/.codegpt/
+/.aicode/
+/.aicodex/
+/.aicoder/
+/.claude/
