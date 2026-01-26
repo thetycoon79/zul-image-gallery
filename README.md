@@ -240,3 +240,7 @@ GPL v2 or later
 ## Credits
 
 - [Fancybox](https://fancyapps.com/fancybox/) - Lightbox library
+
+## Disclaimer
+
+See [DISCLAIMER.md](DISCLAIMER.md) for full terms. This plugin is provided "as is" without warranty. Use at your own risk.
