@@ -58,6 +58,20 @@ Embed a gallery in any post or page:
 [zul_gallery id="123" columns="4" size="large" captions="false"]
 ```
 
+## Screenshots
+
+### Gallery List
+![Gallery Main](screenshots/wpGalleryMain.png)
+
+### Add New Gallery
+![Add Gallery](screenshots/wpAddGallery.png)
+
+### Edit Gallery
+![Edit Gallery](screenshots/wpEditGallery.png)
+
+### Assign Images from Media Library
+![Assign Image](screenshots/wpAssignImage.png)
+
 ## Development
 
 ### Docker Environment
