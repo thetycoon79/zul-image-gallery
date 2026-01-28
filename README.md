@@ -58,6 +58,26 @@ Embed a gallery in any post or page:
 [zul_gallery id="123" columns="4" size="large" captions="false"]
 ```
 
+## Screenshots
+
+### Gallery List
+![Gallery Main](screenshots/wpGalleryMain.png)
+
+### Add New Gallery
+![Add Gallery](screenshots/wpAddGallery.png)
+
+### Edit Gallery
+![Edit Gallery](screenshots/wpEditGallery.png)
+
+### Assign Images from Media Library
+![Assign Image](screenshots/wpAssignImage.png)
+
+### Demao Frontend Gallery
+![Frontend Gallery](screenshots/frontendGallery.png)
+
+### Fancybox Lightbox
+![Fancybox Lightbox](screenshots/fancyboxLightbox.png)
+
 ## Development
 
 ### Docker Environment
