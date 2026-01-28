@@ -72,6 +72,12 @@ Embed a gallery in any post or page:
 ### Assign Images from Media Library
 ![Assign Image](screenshots/wpAssignImage.png)
 
+### Demao Frontend Gallery
+![Frontend Gallery](screenshots/frontendGallery.png)
+
+### Fancybox Lightbox
+![Fancybox Lightbox](screenshots/fancyboxLightbox.png)
+
 ## Development
 
 ### Docker Environment
