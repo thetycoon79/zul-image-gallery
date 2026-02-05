@@ -1,0 +1,3 @@
+[submodule "tools/zul-check-ports"]
+	path = tools/zul-check-ports
+	url = git@github.com:thetycoon79/zul-check-ports.git
