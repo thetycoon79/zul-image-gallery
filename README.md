@@ -80,6 +80,22 @@ Embed a gallery in any post or page:
 
 ## Development
 
+### Cloning the Repository
+
+This project uses git submodules. Clone with submodules included:
+
+```bash
+git clone --recurse-submodules <repository-url>
+```
+
+Or initialize submodules after cloning:
+
+```bash
+git clone <repository-url>
+cd zul-gallery-plugin
+git submodule update --init --recursive
+```
+
 ### Docker Environment
 
 Start the development environment with automatic setup:
@@ -89,12 +105,14 @@ Start the development environment with automatic setup:
 ```
 
 This will:
-1. Check port availability (auto-selects if ports are in use)
-2. Start Docker containers (WordPress + MySQL)
-3. Install WordPress automatically via WP-CLI
-4. Activate the ZUL Gallery plugin
-5. Create 4 sample galleries with 4 images each
-6. Display all URLs in a formatted summary
+1. Initialize git submodules (if not already done)
+2. Check port availability using [zul-check-ports](https://github.com/thetycoon79/zul-check-ports)
+3. Auto-select available ports if defaults are in use
+4. Start Docker containers (WordPress + MySQL)
+5. Install WordPress automatically via WP-CLI
+6. Activate the ZUL Gallery plugin
+7. Create 4 sample galleries with 4 images each
+8. Display all URLs in a formatted summary
 
 **Sample output:**
 ```
@@ -123,24 +141,45 @@ This will:
       http://localhost:8080/?page_id=5
 ```
 
+### Port Management (zul-check-ports)
+
+This project uses [zul-check-ports](https://github.com/thetycoon79/zul-check-ports) as a git submodule to handle dynamic port assignment.
+
+**How it works:**
+
+1. The port checker scans for available ports
+2. If default ports (8080, 3307) are in use, it automatically finds alternatives
+3. Assigned ports are saved to `.env.ports` which is sourced by the start script
+4. Docker Compose uses the exported port variables
+
+**Port configuration:**
+
+| Service | Default | Range |
+|---------|---------|-------|
+| WordPress | 8080 | 8080-8199 |
+| MySQL | 3307 | 3307-3399 |
+
+The port ranges can be customized in `docker/scripts/check-ports.sh`.
+
+**Updating the submodule:**
+
+```bash
+cd tools/zul-check-ports
+git pull origin main
+cd ../..
+git add tools/zul-check-ports
+git commit -m "Update zul-check-ports submodule"
+```
+
 **Environment variables:**
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DB_PORT` | `3307` | MySQL port |
-| `WP_PORT` | `8080` | WordPress port |
-| `AUTO_PORT` | `false` | Auto-select ports if in use |
 | `SKIP_SAMPLE_DATA` | `false` | Skip sample gallery creation |
 
 ```bash
-# Custom ports
-DB_PORT=3308 WP_PORT=8081 ./start.sh
-
 # Skip sample data
 SKIP_SAMPLE_DATA=true ./start.sh
-
-# Auto-select available ports
-AUTO_PORT=true ./start.sh
 ```
 
 ### Available Commands
@@ -178,6 +217,9 @@ zul-gallery-plugin/
 │   └── js/
 │       ├── admin-gallery.js
 │       └── frontend-gallery.js
+├── docker/
+│   └── scripts/
+│       └── check-ports.sh      # Port checker wrapper
 ├── includes/
 │   ├── Admin/
 │   │   ├── Controllers/
@@ -195,12 +237,15 @@ zul-gallery-plugin/
 │   ├── Services/
 │   ├── Sources/
 │   └── Support/
+├── tools/
+│   └── zul-check-ports/        # Git submodule for port management
 ├── tests/
 │   ├── Mocks/
 │   └── Unit/
 ├── docker-compose.yml
 ├── Makefile
 ├── phpunit.xml
+├── start.sh
 └── zul-gallery-plugin.php
 ```
 
