@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Default ports (can be overridden with environment variables)
-DB_PORT=${DB_PORT:-3307}
-WP_PORT=${WP_PORT:-8080}
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
 
 # Options
-AUTO_PORT=${AUTO_PORT:-false}  # Set to true to auto-select available ports
 SKIP_SAMPLE_DATA=${SKIP_SAMPLE_DATA:-false}  # Set to true to skip sample gallery creation
 
 # Colors for output
@@ -16,35 +16,6 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m' # No Color
-
-# Function to find an available port starting from a given port
-find_available_port() {
-    local start_port=$1
-    local port=$start_port
-    while lsof -i :$port > /dev/null 2>&1; do
-        port=$((port + 1))
-        if [ $port -gt $((start_port + 100)) ]; then
-            echo "0"
-            return
-        fi
-    done
-    echo $port
-}
-
-# Function to check if a port is in use
-check_port() {
-    local port=$1
-    local service=$2
-
-    if lsof -i :$port > /dev/null 2>&1; then
-        echo -e "${RED}✗ Port $port ($service) is in use${NC}"
-        echo "  Used by: $(lsof -i :$port | tail -1 | awk '{print $1, $2}')"
-        return 1
-    else
-        echo -e "${GREEN}✓ Port $port ($service) is available${NC}"
-        return 0
-    fi
-}
 
 # Function to wait for WordPress to be ready
 wait_for_wordpress() {
@@ -68,20 +39,21 @@ install_wordpress() {
     echo ""
     echo -e "${CYAN}Installing WordPress...${NC}"
 
-    # Check if WordPress is already installed
-    if docker exec zul_gallery_wp wp core is-installed --path=/var/www/html 2>/dev/null; then
-        echo -e "${GREEN}✓ WordPress is already installed${NC}"
-        return 0
-    fi
-
-    # Install WP-CLI if not present
+    # Install WP-CLI if not present (must be done before any wp commands)
     docker exec zul_gallery_wp bash -c "
         if ! command -v wp &> /dev/null; then
+            echo 'Installing WP-CLI...'
             curl -sO https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
             chmod +x wp-cli.phar
             mv wp-cli.phar /usr/local/bin/wp
         fi
     "
+
+    # Check if WordPress is already installed
+    if docker exec zul_gallery_wp wp core is-installed --path=/var/www/html --allow-root 2>/dev/null; then
+        echo -e "${GREEN}✓ WordPress is already installed${NC}"
+        return 0
+    fi
 
     # Install WordPress
     docker exec zul_gallery_wp wp core install \
@@ -203,81 +175,33 @@ echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━�
 echo -e "${BOLD} ZUL Gallery Plugin - Docker Environment${NC}"
 echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
+
+# Initialize git submodules if needed
+if [ ! -f tools/zul-check-ports/check-ports ]; then
+    echo "Initializing git submodules..."
+    git submodule update --init --recursive
+    echo ""
+fi
+
+# Check port availability and generate .env.ports
 echo "Checking port availability..."
-echo ""
-
-# Check both ports
-db_available=true
-wp_available=true
-
-check_port $DB_PORT "MySQL" || db_available=false
-check_port $WP_PORT "WordPress" || wp_available=false
-
-echo ""
-
-# Handle unavailable ports
-if [ "$db_available" = false ] || [ "$wp_available" = false ]; then
-
-    # Auto mode or interactive mode
-    if [ "$AUTO_PORT" = "true" ] || [ ! -t 0 ]; then
-        echo -e "${YELLOW}Auto-selecting available ports...${NC}"
-
-        if [ "$db_available" = false ]; then
-            DB_PORT=$(find_available_port $DB_PORT)
-            if [ "$DB_PORT" = "0" ]; then
-                echo -e "${RED}Could not find available port for MySQL. Exiting.${NC}"
-                exit 1
-            fi
-        fi
-
-        if [ "$wp_available" = false ]; then
-            WP_PORT=$(find_available_port $WP_PORT)
-            if [ "$WP_PORT" = "0" ]; then
-                echo -e "${RED}Could not find available port for WordPress. Exiting.${NC}"
-                exit 1
-            fi
-        fi
-
-        echo -e "${GREEN}Using ports: MySQL=$DB_PORT, WordPress=$WP_PORT${NC}"
-        echo ""
-    else
-        # Interactive mode
-        echo -e "${YELLOW}Some ports are in use. Options:${NC}"
-        echo ""
-        echo "  1) Auto-select available ports"
-        echo "  2) Enter custom ports"
-        echo "  3) Exit"
-        echo ""
-        read -p "Choose option [1-3]: " choice
-
-        case $choice in
-            1)
-                if [ "$db_available" = false ]; then
-                    DB_PORT=$(find_available_port $DB_PORT)
-                fi
-                if [ "$wp_available" = false ]; then
-                    WP_PORT=$(find_available_port $WP_PORT)
-                fi
-                echo -e "${GREEN}Using ports: MySQL=$DB_PORT, WordPress=$WP_PORT${NC}"
-                ;;
-            2)
-                read -p "Enter MySQL port [default: 3307]: " custom_db
-                read -p "Enter WordPress port [default: 8080]: " custom_wp
-                DB_PORT=${custom_db:-3307}
-                WP_PORT=${custom_wp:-8080}
-                ;;
-            *)
-                echo "Exiting."
-                exit 0
-                ;;
-        esac
-        echo ""
+if ! ./docker/scripts/check-ports.sh; then
+    echo ""
+    read -p "Continue anyway? (y/N) " -n 1 -r
+    echo ""
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
     fi
 fi
 
-# Export for docker-compose
-export DB_PORT
-export WP_PORT
+# Source the generated ports file
+if [ -f .env.ports ]; then
+    source .env.ports
+    export WP_PORT
+    export DB_PORT
+fi
+
+echo ""
 
 echo -e "${GREEN}Starting Docker containers...${NC}"
 echo ""
